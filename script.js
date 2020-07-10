@@ -7,6 +7,10 @@ const countdownElTitle = document.getElementById("countdown-title");
 const countdownBtn = document.getElementById("countdown-button");
 const timeElements = document.querySelectorAll("#countdown span");
 
+const completeEl = document.getElementById("complete");
+const completeElInfo = document.getElementById("complete-info");
+const completeBtn = document.getElementById("complete-button");
+
 let countdownTitle = "";
 let countdownDate = "";
 let countdownValue = Date;
@@ -32,18 +36,29 @@ const updateDOM = () => {
     const minutes = Math.floor((distance % hour) / minute);
     const seconds = Math.floor((distance % minute) / second);
 
-    // Populate Countdown
-    countdownElTitle.textContent = `${countdownTitle}`;
-    timeElements[0].textContent = +days;
-    timeElements[1].textContent = +hours;
-    timeElements[2].textContent = +minutes;
-    timeElements[3].textContent = +seconds;
-
     // Hide input
     inputContainer.hidden = true;
 
-    // Show Countdown
-    countdownEl.hidden = false;
+    // If the countdown has ended, show complete section
+    if (distance < 0) {
+      countdownEl.hidden = true;
+      clearInterval(countdownActive);
+
+      completeElInfo.textContent = `${countdownTitle} finished on ${countdownDate}`;
+
+      completeEl.hidden = false;
+    } else {
+      // Else, show the countdown in progress
+      countdownElTitle.textContent = `${countdownTitle}`;
+
+      timeElements[0].textContent = +days;
+      timeElements[1].textContent = +hours;
+      timeElements[2].textContent = +minutes;
+      timeElements[3].textContent = +seconds;
+
+      completeEl.hidden = true;
+      countdownEl.hidden = false;
+    }
   }, second);
 };
 
@@ -69,6 +84,7 @@ const updateCountdown = (e) => {
 const reset = () => {
   // Hide Countdowns, show Input
   countdownEl.hidden = true;
+  completeEl.hidden = true;
   inputContainer.hidden = false;
 
   // Stop the countdown
@@ -83,4 +99,6 @@ const reset = () => {
 countdownForm.addEventListener("submit", updateCountdown);
 document.addEventListener("click", (e) => {
   if (e.target.closest("#countdown-button")) reset();
+
+  if (e.target.closest("#complete-button")) reset();
 });
